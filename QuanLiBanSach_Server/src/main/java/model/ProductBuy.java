@@ -1,0 +1,190 @@
+package model;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+
+@Table(name = "listProductBuy")
+public class ProductBuy implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
+	private String idProductBuy;
+	@ManyToOne
+	@JoinColumn(name = "idBill")
+	private Bill bill;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "idProduct")
+	private Product product;
+	
+	@Column(name = "NameProduct")
+	private String nameProduct;
+	
+	@Column(name = "Amount")
+	private int amount;
+	
+	@Column(name = "Price")
+	private double price;
+	
+	@Column(name = "Money")
+	private double money;
+	
+	
+
+	public String getIdProductBuy() {
+		return idProductBuy;
+	}
+
+	public void setIdProductBuy(String idProductBuy) {
+		this.idProductBuy = idProductBuy;
+	}
+
+	/**
+	 * @return the bill
+	 */
+	public Bill getBill() {
+		return bill;
+	}
+
+	/**
+	 * @param bill the bill to set
+	 */
+	public void setBill(Bill bill) {
+		this.bill = bill;
+	}
+
+	/**
+	 * @return the product
+	 */
+	public Product getProduct() {
+		return product;
+	}
+
+	/**
+	 * @param product the product to set
+	 */
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	/**
+	 * @return the nameProduct
+	 */
+	public String getNameProduct() {
+		return nameProduct;
+	}
+
+	/**
+	 * @param nameProduct the nameProduct to set
+	 */
+	public void setNameProduct(String nameProduct) {
+		this.nameProduct = nameProduct;
+	}
+
+	/**
+	 * @return the amount
+	 */
+	public int getAmount() {
+		return amount;
+	}
+
+	/**
+	 * @param amount the amount to set
+	 */
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
+	/**
+	 * @return the price
+	 */
+	public double getPrice() {
+		return price;
+	}
+
+	/**
+	 * @param price the price to set
+	 */
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	/**
+	 * @return the money
+	 */
+	public double getMoney() {
+		return money;
+	}
+
+	/**
+	 * @param money the money to set
+	 */
+	public void setMoney(double money) {
+		this.money = getPrice()*getAmount();
+	}
+
+	public ProductBuy(Bill bill, Product product, String nameProduct, int amount, double price, double money) {
+		super();
+		this.bill = bill;
+		this.product = product;
+		this.nameProduct = nameProduct;
+		this.amount = amount;
+		this.price = price;
+		setMoney(money);
+	}
+	
+	
+	
+	
+	
+
+	public ProductBuy(String idProductBuy, Bill bill, Product product, String nameProduct, int amount, double price,
+			double money) {
+		
+		this.idProductBuy = idProductBuy;
+		this.bill = bill;
+		this.product = product;
+		this.nameProduct = nameProduct;
+		this.amount = amount;
+		this.price = price;
+		setMoney(price);
+	}
+
+	public ProductBuy(Product product, String nameProduct, int amount, double price) {
+		super();
+		this.product = product;
+		this.nameProduct = nameProduct;
+		this.amount = amount;
+		this.price = price;
+		setMoney(price);
+	}
+
+
+	public ProductBuy() {
+		super();
+	}
+	
+	
+
+	
+	@Override
+	public String toString() {
+		return "ProductBuy [bill=" + bill + ", product=" + product + ", nameProduct=" + nameProduct + ", amount="
+				+ amount + ", price=" + price + ", money=" + money + "]";
+	}
+	
+	
+	
+}

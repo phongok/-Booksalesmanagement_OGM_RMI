@@ -1,0 +1,152 @@
+package gui;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.hibernate.hql.ast.origin.hql.parse.HQLParser.new_key_return;
+
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JLabel;
+
+public class FrmHome extends JFrame  implements ActionListener{
+
+	private JPanel contentPane;
+	private JMenuItem mntmLogout;
+	private JMenuItem mntmQLNhanVien;
+	private JMenuItem mntmQLSanPham;
+	private JMenuItem mntmBanHang;
+	private JMenuItem mntmQLBanHang;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					FrmHome frame = new FrmHome();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public FrmHome() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(5, 5, 1540, 820);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JMenuBar mnbHome = new JMenuBar();
+		mnbHome.setBounds(0, 0, 1486, 40);
+		contentPane.add(mnbHome);
+		
+		JMenu mnThongTin = new JMenu("Th\u00F4ng tin  ");
+		mnThongTin.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnbHome.add(mnThongTin);
+		
+		JMenuItem mntmTaiKhoan = new JMenuItem("T\u00E0i kho\u1EA3n");
+		mntmTaiKhoan.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnThongTin.add(mntmTaiKhoan);
+		
+		JMenuItem mntmLichLam = new JMenuItem("L\u1ECBch l\u00E0m");
+		mntmLichLam.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnThongTin.add(mntmLichLam);
+		
+		mntmLogout = new JMenuItem("\u0110\u0103ng xu\u1EA5t\r\n");
+		mntmLogout.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnThongTin.add(mntmLogout);
+		
+		JMenu mnBanHang = new JMenu("B\u00E1n h\u00E0ng  ");
+		mnBanHang.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnbHome.add(mnBanHang);
+		
+		mntmBanHang = new JMenuItem("B\u00E1n h\u00E0ng");
+		mntmBanHang.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnBanHang.add(mntmBanHang);
+		
+		JMenu mnQuanLi = new JMenu("Qu\u1EA3n l\u00ED      ");
+		mnQuanLi.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnbHome.add(mnQuanLi);
+		
+		mntmQLBanHang = new JMenuItem("B\u00E1n h\u00E0ng");
+		mntmQLBanHang.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnQuanLi.add(mntmQLBanHang);
+		
+		mntmQLNhanVien = new JMenuItem("Nh\u00E2n vi\u00EAn");
+		mntmQLNhanVien.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnQuanLi.add(mntmQLNhanVien);
+		
+		mntmQLSanPham = new JMenuItem("S\u1EA3n ph\u1EA9m");
+		mntmQLSanPham.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnQuanLi.add(mntmQLSanPham);
+		
+		JMenu mnNewMenu_2 = new JMenu("Th\u1ED1ng k\u00EA    ");
+		mnNewMenu_2.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnbHome.add(mnNewMenu_2);
+		
+		JMenuItem mntmTKDoanhThu = new JMenuItem("Doanh thu");
+		mntmTKDoanhThu.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		mnNewMenu_2.add(mntmTKDoanhThu);
+		
+		JLabel lblTittle = new JLabel("	HIỆU SÁCH SÀI GÒN");
+		lblTittle.setFont(new Font("Times New Roman", Font.BOLD, 35));
+		lblTittle.setBounds(522, 50, 389, 61);
+		contentPane.add(lblTittle);
+		
+		mntmLogout.addActionListener(this);
+		
+		mntmQLNhanVien.addActionListener(this);
+		mntmQLSanPham.addActionListener(this);
+		mntmBanHang.addActionListener(this);
+		mntmQLBanHang.addActionListener(this);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+			Object object = e.getSource();
+			if (object.equals(mntmLogout)) {
+				int confirm = JOptionPane.showConfirmDialog(this, "Bạn có muốn đăng xuất hay không", "Thông Báo",
+						JOptionPane.YES_NO_OPTION);
+				if (confirm == JOptionPane.YES_OPTION) {
+					dispose();
+					new FrmLogin().setVisible(true);
+				}
+			}
+			else if (object.equals(mntmQLNhanVien)) {
+				dispose();
+				new FrmEmployeeManager().setVisible(true);
+			}
+			else if (object.equals(mntmQLSanPham)) {
+				dispose();
+				new FrmProductManager().setVisible(true);
+			}
+			else if (object.equals(mntmBanHang)) {
+				dispose();
+				new FrmSell().setVisible(true);
+			}
+			else if (object.equals(mntmQLBanHang)) {
+				dispose();
+				new FrmBillManager().setVisible(true);
+			}
+		
+	}
+}

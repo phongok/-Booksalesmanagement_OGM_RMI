@@ -1,0 +1,416 @@
+package gui;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.Container;
+
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.hibernate.hql.ast.origin.hql.parse.HQLParser.new_key_return;
+import org.hibernate.hql.ast.origin.hql.resolve.GeneratedHQLResolver.intermediateIndexOperation_return;
+
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
+
+import dao.BillDao;
+import dao.ProductBuyDao;
+import dao.ProductDao;
+import model.Bill;
+import model.Product;
+import model.ProductBuy;
+
+import javax.swing.border.BevelBorder;
+import javax.swing.UIManager;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.awt.GridLayout;
+
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JComboBox;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import java.awt.Component;
+
+public class FrmBillManager extends JFrame implements ActionListener, MouseListener {
+
+	private JPanel contentPane;
+	private DefaultTableModel data_ModelBill;
+	private JTable table_Bill;
+	private JTextField txtSeach;
+
+	private Container pnlListProduct1;
+	private Object btnExit;
+	private JTextField txtTenKH;
+
+	private BillDao billDao;
+	private ProductBuyDao productBuyDao;
+
+	private List<Bill> bills = new ArrayList<Bill>();
+
+	private List<ProductBuy> productBuys = new ArrayList<ProductBuy>();
+
+	private JButton btnQuayLai;
+	private JButton btnSearch;
+	private JButton btnHienBang;
+	private DefaultTableModel data_ModelProductBuy;
+	private JTable table_ProductBuy;
+	private JPanel pnlCTHD;
+	private JTextField txtMaHD;
+	private JDateChooser dateMua;
+	private JLabel lblMaNV;
+	private JLabel lblTongTien;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					FrmBillManager frame = new FrmBillManager();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 * @throws RemoteException 
+	 */
+	public FrmBillManager() {
+		SecurityManager securityManager = System.getSecurityManager();
+		if (securityManager == null) {
+			System.setProperty("java.security.policy", "rmi/policy.policy");
+			System.setSecurityManager(new SecurityManager());
+		}
+		try {
+			billDao = (BillDao) Naming.lookup("rmi://localhost:1000/billDao");
+			productBuyDao =  (ProductBuyDao) Naming.lookup("rmi://localhost:1000/productBuyDao");
+
+		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		setTitle("Quản lí bán hàng");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(0, 3, 1540, 820);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JPanel pnlInfo = new JPanel();
+		pnlInfo.setBorder(UIManager.getBorder("ToolTip.border"));
+		pnlInfo.setBackground(SystemColor.inactiveCaptionBorder);
+		pnlInfo.setBounds(2, 2, 1518, 445);
+		contentPane.add(pnlInfo);
+		pnlInfo.setLayout(null);
+
+		JLabel lblTittle = new JLabel("Quản lí hóa đơn");
+		lblTittle.setFont(new Font("Times New Roman", Font.BOLD, 35));
+		lblTittle.setBounds(612, 10, 303, 40);
+		pnlInfo.add(lblTittle);
+
+		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.setBackground(Color.WHITE);
+		panel.setBounds(762, 80, 746, 227);
+		pnlInfo.add(panel);
+		panel.setLayout(null);
+
+		Box bQuanLiNhanVien_1 = Box.createHorizontalBox();
+		bQuanLiNhanVien_1.setBounds(10, 10, 726, 207);
+		panel.add(bQuanLiNhanVien_1);
+
+		String[] headers_SPBuy = { "Mã sản phẩm", "Tên sản phẩm", "Số lượng", "Đơn giá", "Thành tiền" };
+
+		data_ModelProductBuy = new DefaultTableModel(headers_SPBuy, 0);
+		JScrollPane jScrollPane_ProductBuy = new JScrollPane(table_ProductBuy = new JTable(data_ModelProductBuy));
+		jScrollPane_ProductBuy.setBorder(BorderFactory.createTitledBorder("Danh sách sản phẩm mua"));
+		bQuanLiNhanVien_1.add(jScrollPane_ProductBuy);
+
+		JLabel lblNewLabel = new JLabel("Mã nhân viên: ");
+		lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNewLabel.setBounds(36, 140, 179, 35);
+		pnlInfo.add(lblNewLabel);
+
+		 lblMaNV = new JLabel("");
+		lblMaNV.setForeground(Color.RED);
+		lblMaNV.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblMaNV.setBounds(238, 140, 454, 35);
+		pnlInfo.add(lblMaNV);
+
+		JLabel lblTnKhchHng = new JLabel("Tên khách hàng: ");
+		lblTnKhchHng.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblTnKhchHng.setBounds(36, 210, 192, 35);
+		pnlInfo.add(lblTnKhchHng);
+
+		txtTenKH = new JTextField();
+		txtTenKH.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		txtTenKH.setBounds(238, 210, 446, 35);
+		pnlInfo.add(txtTenKH);
+		txtTenKH.setColumns(10);
+
+		JLabel lblNewLabel_2 = new JLabel("Tổng tiền: ");
+		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNewLabel_2.setBounds(36, 350, 179, 35);
+		pnlInfo.add(lblNewLabel_2);
+
+		lblTongTien = new JLabel("VND");
+		lblTongTien.setForeground(Color.RED);
+		lblTongTien.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblTongTien.setBounds(238, 350, 454, 35);
+		pnlInfo.add(lblTongTien);
+
+		JButton btnLuuHoaDon = new JButton("Lưu hóa đơn");
+		
+		btnLuuHoaDon.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		btnLuuHoaDon.setBounds(365, 395, 200, 40);
+		pnlInfo.add(btnLuuHoaDon);
+
+		JButton btnInHan = new JButton("In hóa đơn");
+		btnInHan.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		btnInHan.setBounds(624, 395, 200, 40);
+		pnlInfo.add(btnInHan);
+
+		btnQuayLai = new JButton("Quay lại");
+		btnQuayLai.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		btnQuayLai.setBounds(875, 395, 159, 40);
+		pnlInfo.add(btnQuayLai);
+
+		JLabel lblMHan = new JLabel("Mã hóa đơn: ");
+		lblMHan.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblMHan.setBounds(36, 70, 170, 35);
+		pnlInfo.add(lblMHan);
+
+		txtMaHD = new JTextField();
+		txtMaHD.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		txtMaHD.setColumns(10);
+		txtMaHD.setBounds(238, 70, 446, 35);
+		pnlInfo.add(txtMaHD);
+
+		JLabel lblNgy = new JLabel("Ngày mua:");
+		lblNgy.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNgy.setBounds(36, 280, 192, 35);
+		pnlInfo.add(lblNgy);
+
+		dateMua = new JDateChooser();
+		dateMua.setDateFormatString("yyyy-MM-dd");
+		dateMua.setFont(new Font("Time New Roman", Font.BOLD, 18));
+		dateMua.setBounds(238, 280, 446, 30);
+		pnlInfo.add(dateMua);
+
+		JPanel pnlListProduct = new JPanel();
+		pnlListProduct.setBorder(UIManager.getBorder("ToolTip.border"));
+		pnlListProduct.setBackground(SystemColor.inactiveCaptionBorder);
+		pnlListProduct.setBounds(2, 457, 1518, 313);
+		contentPane.add(pnlListProduct);
+		pnlListProduct.setLayout(null);
+
+		JLabel lblTimKiem = new JLabel("Tìm kiếm: ");
+		lblTimKiem.setFont(new Font("Times New Roman", Font.BOLD, 22));
+		lblTimKiem.setBounds(29, 10, 111, 45);
+		pnlListProduct.add(lblTimKiem);
+
+		txtSeach = new JTextField();
+		txtSeach.setFont(new Font("Times New Roman", Font.BOLD, 22));
+		txtSeach.setBounds(140, 20, 314, 30);
+		pnlListProduct.add(txtSeach);
+		txtSeach.setColumns(10);
+
+		btnSearch = new JButton("Tìm kiếm");
+		btnSearch.setFont(new Font("Times New Roman", Font.BOLD, 22));
+		btnSearch.setBounds(464, 20, 130, 30);
+		pnlListProduct.add(btnSearch);
+
+		Box bDSBill;
+		pnlListProduct.add(bDSBill = Box.createHorizontalBox());
+
+		btnHienBang = new JButton("Hiện bảng");
+		btnHienBang.setFont(new Font("Times New Roman", Font.BOLD, 22));
+		btnHienBang.setBounds(616, 20, 160, 30);
+		pnlListProduct.add(btnHienBang);
+
+		String[] headers_NV = { "Mã hóa đơn", "Mã nhân viên", "Tên khách hàng", "Ngày mua", "Tổng tiền", };
+		data_ModelBill = new DefaultTableModel(headers_NV, 0);
+		JScrollPane jScrollPane_Bill;
+		bDSBill.add(jScrollPane_Bill = new JScrollPane(table_Bill = new JTable(data_ModelBill)));
+		jScrollPane_Bill.setBorder(BorderFactory.createTitledBorder("Danh sách hóa đơn"));
+		bDSBill.setBounds(5, 65, 1510, 240);
+
+		table_Bill.addMouseListener(this);
+
+		btnQuayLai.addActionListener(this);
+		btnSearch.addActionListener(this);
+		btnHienBang.addActionListener(this);
+		
+		try {
+			SeachProductBuyIDBill();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+			updateTableBill();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		Object object = e.getSource();
+		if (object.equals(btnHienBang)) {
+			DeleteTableBill();
+			try {
+				updateTableBill();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if (object.equals(btnSearch)) {
+			try {
+				SeachAction();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if (object.equals(btnQuayLai)) {
+			dispose();
+			new FrmHome().setVisible(true); 
+		}
+	}
+	private void SeachProductBuyIDBill() throws RemoteException {
+		productBuys.clear();
+		productBuys = productBuyDao.getProductBuyOfIdBill("HD01");
+		for (Bill bill : bills) {
+			System.out.println(bill);
+		}
+	}
+	
+	private void DeleteTableBill() {
+
+		DefaultTableModel dm = (DefaultTableModel) table_Bill.getModel();
+		dm.getDataVector().removeAllElements();
+
+	}
+	
+	private void DeleteTableProductBuy() {
+
+		DefaultTableModel dm = (DefaultTableModel) table_ProductBuy.getModel();
+		dm.getDataVector().removeAllElements();
+
+	}
+	
+	
+	
+	private void SeachAction() throws RemoteException {
+		String seach = txtSeach.getText().trim();
+		if (seach.equals("")) {
+			JOptionPane.showMessageDialog(this, "Bạn chưa nhập từ khóa cần tìm");
+		}
+		else {
+			Bill bill = billDao.getBill(seach);
+			if (bill != null) {
+				DeleteTableBill();
+				String rowBill[] = { bill.getIdBill(), bill.getEmployee().getName(), bill.getNameCustomer(),
+						bill.getDatecreate() + "", bill.getMoney() + "" };
+				data_ModelBill.addRow(rowBill);;
+			} else {
+
+			}
+		}
+	}
+	
+	private void updateTableBill() throws RemoteException {
+		bills.clear();
+		bills = billDao.getBills();
+		for (Bill bill : bills) {
+			String rowBill[] = { bill.getIdBill(), bill.getEmployee().getIdEmloyee(), bill.getNameCustomer(),
+					bill.getDatecreate() + "", bill.getMoney() + "" };
+			data_ModelBill.addRow(rowBill);;
+		}
+	}
+
+	public void mouseClicked(MouseEvent e) {
+		Object object = e.getSource();
+		if (object.equals(table_Bill)) {
+			int row = table_Bill.getSelectedRow();
+			txtMaHD.setText(table_Bill.getValueAt(row, 0).toString());
+			lblMaNV.setText(table_Bill.getValueAt(row, 1).toString());
+			txtTenKH.setText(table_Bill.getValueAt(row, 2).toString());
+			lblTongTien.setText(table_Bill.getValueAt(row, 4).toString());
+			try {
+				SeachProductBuyForIDBill(row);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+	}
+	
+	private void SeachProductBuyForIDBill(int row) throws RemoteException{
+		productBuys.clear();
+		productBuys = productBuyDao.getProductBuyOfIdBill(table_Bill.getValueAt(row, 0).toString());
+		for (ProductBuy p : productBuys) {
+			String rowProBuy[] = {p.getIdProductBuy(), p.getNameProduct(), p.getAmount()+"", p.getPrice()+"", p.getMoney()+""};
+			data_ModelProductBuy.addRow(rowProBuy);
+		}
+	}
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+}

@@ -1,0 +1,118 @@
+package dao;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
+
+import org.hibernate.Transaction;
+import org.hibernate.ogm.OgmSession;
+import org.hibernate.ogm.OgmSessionFactory;
+
+import model.ProductBuy;
+import util.HibernateUtil;
+
+public class ProductBuyDaoImlp extends UnicastRemoteObject implements ProductBuyDao {
+	private OgmSessionFactory sessionFactory;
+
+	public ProductBuyDaoImlp() throws RemoteException {
+		sessionFactory = HibernateUtil.getInstance().getSessionFactory();
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public boolean createProductBuy(ProductBuy productBuy) throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.beginTransaction();
+		try {
+			session.save(productBuy);
+			tr.commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			tr.rollback();
+		}
+		session.close();
+		return false;
+	}
+
+	public boolean deleteProductBuy(String idProductBuy) throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.getTransaction();
+		try {
+			tr.begin();
+			session.remove(session.find(ProductBuy.class, idProductBuy));
+			tr.commit();
+			return true;
+		} catch (Exception e) {
+			tr.rollback();
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean updateProductBuy(ProductBuy productBuy) throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.beginTransaction();
+		try {
+			session.update(productBuy);
+			tr.commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			tr.rollback();
+		}
+		session.close();
+		return false;
+	}
+
+	public List<ProductBuy> getProductBuys() throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.getTransaction();
+		try {
+			tr.begin();
+			String query = "db.listProductBuy.find({})";
+			List<ProductBuy> productBuys = session.createNativeQuery(query, ProductBuy.class).getResultList();
+			tr.commit();
+			return productBuys;
+		} catch (Exception e) {
+			tr.rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public ProductBuy getProductBuy(String idProductBuy) throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.beginTransaction();
+		try {
+			ProductBuy productBuy = session.find(ProductBuy.class, idProductBuy);
+			tr.commit();
+			return productBuy;
+		} catch (Exception e) {
+			e.printStackTrace();
+			tr.rollback();
+		}
+		session.close();
+		return null;
+	}
+
+	public List<ProductBuy> getProductBuyOfIdBill(String idBill) throws RemoteException {
+		OgmSession session = sessionFactory.openSession();
+		Transaction tr = session.getTransaction();
+		try {
+			tr.begin();
+			String query = "db.listProductBuy.find({idBill: '"+idBill+"'})";
+			List<ProductBuy> productBuys = session.createNativeQuery(query, ProductBuy.class).getResultList();
+			tr.commit();
+			return productBuys;
+		} catch (Exception e) {
+			tr.rollback();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+}
